@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package cq.v1;
 
-option go_package = "github.com/mozilla-ai/cq/internal/cqpb;cqpb";
+option go_package = "github.com/mozilla-ai/cq-proto/cqpb;cqpb";
 
 import "cq/v1/knowledge_unit.proto";
 
 // Request to propose a new knowledge unit.
 message ProposeRequest {
-  repeated string domain = 1;      // At least one required.
+  repeated string domain = 1;      // At least one expected; enforced by the server.
   Insight insight = 2;
   Context context = 3;
   string created_by = 4;
@@ -24,7 +24,7 @@ message QueryRequest {
   repeated string domain = 1;
   string language = 2;
   string framework = 3;
-  int32 limit = 4;                 // Default 5; max 50.
+  int32 limit = 4;                 // Server default 5; values above 50 are capped.
 }
 
 // Query results.

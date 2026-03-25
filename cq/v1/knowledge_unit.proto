@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cq.v1;
 
-option go_package = "github.com/mozilla-ai/cq/internal/cqpb;cqpb";
+option go_package = "github.com/mozilla-ai/cq-proto/cqpb;cqpb";
 
 import "google/protobuf/timestamp.proto";
 
@@ -44,8 +44,8 @@ message Context {
 
 // Confidence and confirmation metrics.
 message Evidence {
-  double confidence = 1;           // 0.0 to 1.0; default 0.5.
-  int32 confirmations = 2;         // Default 1.
+  double confidence = 1;           // 0.0 to 1.0; server assumes 0.5 when unset.
+  int32 confirmations = 2;         // Server assumes 1 when unset.
   google.protobuf.Timestamp first_observed = 3;
   google.protobuf.Timestamp last_confirmed = 4;
 }
@@ -53,8 +53,8 @@ message Evidence {
 // A single unit of shared agent knowledge.
 message KnowledgeUnit {
   string id = 1;                   // Prefixed UUID: "ku_<hex>".
-  int32 version = 2;               // Schema version; default 1.
-  repeated string domain = 3;      // At least one required.
+  int32 version = 2;               // Schema version; server assumes 1 when unset.
+  repeated string domain = 3;      // At least one expected; enforced by the server.
   Insight insight = 4;
   Context context = 5;
   Evidence evidence = 6;

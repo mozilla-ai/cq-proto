@@ -8,7 +8,8 @@ open standard for shared agent learning.
 Requires [buf](https://buf.build/docs/installation).
 
     buf lint              # Lint proto files.
-    buf breaking          # Check for breaking changes against main.
+    buf breaking \        # Check for breaking changes against main.
+      --against '.git#branch=main'
     buf convert . \       # Validate a fixture.
       --type cq.v1.KnowledgeUnit \
       --from fixtures/valid-unit.json

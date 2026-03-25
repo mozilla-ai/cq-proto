@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package cq.v1;
 
-option go_package = "github.com/mozilla-ai/cq/internal/cqpb;cqpb";
+option go_package = "github.com/mozilla-ai/cq-proto/cqpb;cqpb";
 
 import "cq/v1/knowledge_unit.proto";
+import "google/protobuf/timestamp.proto";
 
 // Review status for a knowledge unit.
 enum ReviewStatus {
@@ -19,7 +20,7 @@ message ReviewItem {
   KnowledgeUnit knowledge_unit = 1;
   ReviewStatus status = 2;
   string reviewed_by = 3;
-  string reviewed_at = 4;          // ISO 8601 timestamp.
+  google.protobuf.Timestamp reviewed_at = 4;
 }
 
 // Paginated review queue response.
@@ -35,12 +36,12 @@ message ReviewDecisionResponse {
   string unit_id = 1;
   ReviewStatus status = 2;
   string reviewed_by = 3;
-  string reviewed_at = 4;
+  google.protobuf.Timestamp reviewed_at = 4;
 }
 
 // Daily proposal, approval, and rejection counts.
 message DailyCount {
-  string date = 1;                 // YYYY-MM-DD.
+  google.protobuf.Timestamp date = 1;
   int32 proposed = 2;
   int32 approved = 3;
   int32 rejected = 4;
@@ -51,10 +52,24 @@ message TrendsResponse {
   repeated DailyCount daily = 1;
 }
 
+// Counts of knowledge units by review status.
+message StatusCounts {
+  int32 pending = 1;
+  int32 approved = 2;
+  int32 rejected = 3;
+}
+
+// A single confidence distribution bucket.
+message ConfidenceBucket {
+  double lower = 1;                // Inclusive lower bound.
+  double upper = 2;                // Exclusive upper bound (inclusive at 1.0).
+  int32 count = 3;
+}
+
 // Dashboard metrics response.
 message ReviewStatsResponse {
-  map<string, int32> counts = 1;
+  StatusCounts counts = 1;
   map<string, int32> domains = 2;
-  map<string, int32> confidence_distribution = 3;
+  repeated ConfidenceBucket confidence_distribution = 3;
   TrendsResponse trends = 4;
 }

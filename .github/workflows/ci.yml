@@ -27,7 +27,17 @@ jobs:
       - uses: bufbuild/buf-action@v1
         with:
           setup_only: true
-      - run: buf breaking --against .git#branch=main
+      - name: Check for proto files on main
+        id: check_main
+        run: |
+          if git show origin/main:buf.yaml > /dev/null 2>&1; then
+            echo "has_protos=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_protos=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping: main has no proto module yet."
+          fi
+      - if: steps.check_main.outputs.has_protos == 'true'
+        run: buf breaking --against .git#branch=origin/main
 
   fixtures:
     needs: lint
