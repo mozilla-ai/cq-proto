@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package cq.v1;
+
+option go_package = "github.com/mozilla-ai/cq/internal/cqpb;cqpb";
+
+import "cq/v1/knowledge_unit.proto";
+
+// Review status for a knowledge unit.
+enum ReviewStatus {
+  REVIEW_STATUS_UNSPECIFIED = 0;
+  REVIEW_STATUS_PENDING = 1;
+  REVIEW_STATUS_APPROVED = 2;
+  REVIEW_STATUS_REJECTED = 3;
+}
+
+// A knowledge unit with review metadata.
+message ReviewItem {
+  KnowledgeUnit knowledge_unit = 1;
+  ReviewStatus status = 2;
+  string reviewed_by = 3;
+  string reviewed_at = 4;          // ISO 8601 timestamp.
+}
+
+// Paginated review queue response.
+message ReviewQueueResponse {
+  repeated ReviewItem items = 1;
+  int32 total = 2;
+  int32 offset = 3;
+  int32 limit = 4;
+}
+
+// Response after approving or rejecting a KU.
+message ReviewDecisionResponse {
+  string unit_id = 1;
+  ReviewStatus status = 2;
+  string reviewed_by = 3;
+  string reviewed_at = 4;
+}
+
+// Daily proposal, approval, and rejection counts.
+message DailyCount {
+  string date = 1;                 // YYYY-MM-DD.
+  int32 proposed = 2;
+  int32 approved = 3;
+  int32 rejected = 4;
+}
+
+// Trend data for the dashboard chart.
+message TrendsResponse {
+  repeated DailyCount daily = 1;
+}
+
+// Dashboard metrics response.
+message ReviewStatsResponse {
+  map<string, int32> counts = 1;
+  map<string, int32> domains = 2;
+  map<string, int32> confidence_distribution = 3;
+  TrendsResponse trends = 4;
+}

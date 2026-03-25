@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package cq.v1;
+
+option go_package = "github.com/mozilla-ai/cq/internal/cqpb;cqpb";
+
+import "cq/v1/knowledge_unit.proto";
+
+// Request to propose a new knowledge unit.
+message ProposeRequest {
+  repeated string domain = 1;      // At least one required.
+  Insight insight = 2;
+  Context context = 3;
+  string created_by = 4;
+}
+
+// Response after proposing a knowledge unit.
+message ProposeResponse {
+  KnowledgeUnit knowledge_unit = 1;
+}
+
+// Query parameters for searching knowledge units.
+message QueryRequest {
+  repeated string domain = 1;
+  string language = 2;
+  string framework = 3;
+  int32 limit = 4;                 // Default 5; max 50.
+}
+
+// Query results.
+message QueryResponse {
+  repeated KnowledgeUnit units = 1;
+}
+
+// Request to confirm a knowledge unit.
+message ConfirmRequest {
+  string unit_id = 1;
+}
+
+// Response after confirming a knowledge unit.
+message ConfirmResponse {
+  KnowledgeUnit knowledge_unit = 1;
+}
+
+// Request to flag a knowledge unit.
+message FlagRequest {
+  string unit_id = 1;
+  FlagReason reason = 2;
+}
+
+// Response after flagging a knowledge unit.
+message FlagResponse {
+  KnowledgeUnit knowledge_unit = 1;
+}
+
+// Store-level statistics request.
+message StatsRequest {}
+
+// Store-level statistics.
+message StatsResponse {
+  int32 total_units = 1;
+  map<string, int32> domains = 2;
+}
+
+// Health check request.
+message HealthRequest {}
+
+// Health check response.
+message HealthResponse {
+  string status = 1;
+}
+
+// Team API service definition.
+service TeamAPIService {
+  rpc Health(HealthRequest) returns (HealthResponse);
+  rpc Query(QueryRequest) returns (QueryResponse);
+  rpc Propose(ProposeRequest) returns (ProposeResponse);
+  rpc Confirm(ConfirmRequest) returns (ConfirmResponse);
+  rpc Flag(FlagRequest) returns (FlagResponse);
+  rpc Stats(StatsRequest) returns (StatsResponse);
+}
