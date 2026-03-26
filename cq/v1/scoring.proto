@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cq.v1;
+
+option go_package = "github.com/mozilla-ai/cq-proto/cqpb;cqpb";
+
+// Relevance scoring weights.
+// Domain overlap is scored by Jaccard similarity.
+// Language and framework matches are binary (0.0 or 1.0).
+// Final relevance = domain_weight * domain_score
+//                 + language_weight * language_score
+//                 + framework_weight * framework_score.
+message RelevanceWeights {
+  double domain_weight = 1;        // Recommended value: 0.7.
+  double language_weight = 2;      // Recommended value: 0.15.
+  double framework_weight = 3;     // Recommended value: 0.15.
+}
+
+// Confidence adjustment constants.
+message ConfidenceConstants {
+  double initial_confidence = 1;   // Recommended value: 0.5.
+  double confirmation_boost = 2;   // Recommended value: 0.1.
+  double flag_penalty = 3;         // Recommended value: 0.15.
+  double ceiling = 4;              // Recommended value: 1.0.
+  double floor = 5;                // Recommended value: 0.0.
+}

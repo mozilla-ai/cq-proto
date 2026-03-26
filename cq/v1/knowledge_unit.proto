@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package cq.v1;
+
+option go_package = "github.com/mozilla-ai/cq-proto/cqpb;cqpb";
+
+import "google/protobuf/timestamp.proto";
+
+// Storage tier for a knowledge unit.
+enum Tier {
+  TIER_UNSPECIFIED = 0;
+  TIER_LOCAL = 1;
+  TIER_PRIVATE = 2;
+  TIER_PUBLIC = 3;
+}
+
+// Reason for flagging a knowledge unit.
+enum FlagReason {
+  FLAG_REASON_UNSPECIFIED = 0;
+  FLAG_REASON_STALE = 1;
+  FLAG_REASON_INCORRECT = 2;
+  FLAG_REASON_DUPLICATE = 3;
+}
+
+// A recorded flag against a knowledge unit.
+message Flag {
+  FlagReason reason = 1;
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+// Tripartite insight: what happened, why it matters, what to do.
+message Insight {
+  string summary = 1;
+  string detail = 2;
+  string action = 3;
+}
+
+// Language, framework, and pattern context.
+message Context {
+  repeated string languages = 1;
+  repeated string frameworks = 2;
+  string pattern = 3;
+}
+
+// Confidence and confirmation metrics.
+message Evidence {
+  double confidence = 1;           // 0.0 to 1.0; server assumes 0.5 when unset.
+  int32 confirmations = 2;         // Server assumes 1 when unset.
+  google.protobuf.Timestamp first_observed = 3;
+  google.protobuf.Timestamp last_confirmed = 4;
+}
+
+// A single unit of shared agent knowledge.
+message KnowledgeUnit {
+  string id = 1;                   // Prefixed UUID: "ku_<hex>".
+  int32 version = 2;               // Schema version; server assumes 1 when unset.
+  repeated string domain = 3;      // At least one expected; enforced by the server.
+  Insight insight = 4;
+  Context context = 5;
+  Evidence evidence = 6;
+  Tier tier = 7;
+  string created_by = 8;
+  string superseded_by = 9;        // ID of the replacing KU, if any.
+  repeated Flag flags = 10;
+}
